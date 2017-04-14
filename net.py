@@ -7,88 +7,40 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution1D, MaxPooling1D,LSTM
-from keras.utils import np_utils
+from dataPreprocessing import preprocess_data
 import numpy as np
 import os
 
-def create_model(data, nb_classes):
-    # print("data.shape[1:]")
-    # print(data.shape[1:])
-    model = Sequential()
-    model.add(Convolution1D(nb_filter=16,strides=1,filter_length=4,border_mode='same',input_shape=data.shape[1:]))
-    model.add(Activation('linear'))
-    model.add(LSTM(output_dim=128))
-    model.add(Activation('linear'))
-    model.add(LSTM(output_dim=256))
-    model.add(Activation('linear'))
-    model.add(Dense(output_dim=128))
-    model.add(Activation('tanh'))
-    model.add(Dense(output_dim=1))
-    model.add(Activation('linear'))
-# 使用RMSprop为训练时的优化函数
-    model.compile(loss='categorical_crossentropy',
-              optimizer='rmsprop',
+# 使用preprocess_data处理数据:
+(X_train, y_train), (X_test, y_test) = preprocess_data('loadData.mat')
+
+X_train /= 512
+X_test /= 512
+
+batch_size=1
+nb_epoch = 10
+sizeX=100
+sizeY=128
+
+model = Sequential()
+model.add(Dense(units=64, input_dim=128,output_dim=10))
+model.add(Activation('relu'))
+model.add(Dense(units=10,output_dim=1))
+model.add(Activation('softmax'))
+
+
+model.compile(loss='binary_crossentropy',
+              optimizer='adam',
               metrics=['accuracy'])
 
-    return model
-
-# 输入的图片的维度
-img_rows, img_cols = 32, 32
-# RGB图像有三个通道.
-img_channels = 3
-
-# 使用preprocess_data处理数据:
-(X_train, y_train), (X_test, y_test) = preprocess_data('/Users/luzh14/PycharmProjects/cifar10CNN/cifar-10-batches-py')
-print('X_train shape:', X_train.shape)
-print(X_train.shape[0], 'train samples')
-print(X_test.shape[0], 'test samples')
-
-# Convert class vectors to binary class matrices.
-Y_train = np_utils.to_categorical(y_train)
-Y_test = np_utils.to_categorical(y_test)
-
-X_train = X_train.astype('float32')
-X_test = X_test.astype('float32')
-# 由于图片像素值标准化值0-1区间
-X_train /= 255
-X_test /= 255
-
-# 定义网络训练时的参数
-batch_size = 500 # 由于训练集有50000张图片，因此我们为使训练快一些批训练的批大小设置为500
-nb_classes = 10
-nb_epoch = 10
-data_augmentation = True
-
-if not data_augmentation:
-    print('Not using data augmentation.')
-    model = create_model(X_train, nb_classes)
-    model.fit(X_train, Y_train,
-              batch_size=batch_size,
-              nb_epoch=nb_epoch,
-              validation_data=(X_test, Y_test),
-              shuffle=True)
-else:
-    print('Using real-time data augmentation.')
-    # This will do preprocessing and realtime data augmentation:
-    datagen = ImageDataGenerator(
-        featurewise_center=False,  # set input mean to 0 over the dataset
-        samplewise_center=False,  # set each sample mean to 0
-        featurewise_std_normalization=False,  # divide inputs by std of the dataset
-        samplewise_std_normalization=False,  # divide each input by its std
-        zca_whitening=False,  # apply ZCA whitening
-        rotation_range=0,  # randomly rotate images in the range (degrees, 0 to 180)
-        width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
-        height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
-        horizontal_flip=True,  # randomly flip images
-        vertical_flip=False)  # randomly flip images
-
-    # Compute quantities required for featurewise normalization
-    # (std, mean, and principal components if ZCA whitening is applied).
-
-    #创建网络
-    model = create_model(X_train, nb_classes)
-    datagen.fit(X_train)
+print('Train...')
+model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=nb_epoch,
+          validation_data=(X_test, y_test))
+score, acc = model.evaluate(X_test, y_test, batch_size=batch_size)
+print('Test score:', score)
+print('Test accuracy:', acc)
 
 
-    save_fn = 'loadData.mat'
-    sio.savemat(save_fn, {'X_train': X_train, 'y_train': y_train,'X_test': X_test, 'y_test': y_test})
+
+
+
