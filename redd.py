@@ -24,5 +24,5 @@ microwave=microwave.resample('S',fill_method='ffill')[0:]#插值
 
 f = open("/Users/luzh14/busLineDeepLearning/main.csv",'wb')
 for x in range(0,30000):
-    f.write(str(channel_1[x,1]/1000)+'\n')
+    f.write(str(main[x])+'\n')
 f.close()
