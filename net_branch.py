@@ -17,24 +17,24 @@ import os
 X_train, y_train, X_test, y_test = preprocess_data('main.csv',128)
 NULL, y_train, NULL, y_test = preprocess_data('microwave.csv',128)
 
+X_train=X_train.reshape(26887,126)
 
 def build_model(layers):
     model = Sequential()
-
-    model.add(LSTM(
-        input_dim=layers[0],
-        output_dim=layers[1],
-        return_sequences=True))
-    model.add(Dropout(0.1))
-
-    model.add(LSTM(
-        layers[2],
-        return_sequences=False))
-    model.add(Dropout(0.1))
+    model.add(Dense(1024, input_dim=126))
+    model.add(Activation("sigmoid"))
 
     model.add(Dense(
-        output_dim=layers[3]))
-    model.add(Activation("linear"))
+        output_dim=1024))
+    model.add(Activation("sigmoid"))
+
+    model.add(Dense(
+        output_dim=1024))
+    model.add(Activation("sigmoid"))
+
+    model.add(Dense(
+        output_dim=1))
+    model.add(Activation("sigmoid"))
 
     start = time.time()
     model.compile(loss="mse", optimizer="rmsprop")
@@ -47,7 +47,7 @@ def predict_point_by_point(model, data):
     predicted = np.reshape(predicted, (predicted.size,))
     return predicted
 
-epochs  = 1
+epochs  = 10
 
 print('> Loading data... ')
 
@@ -63,6 +63,7 @@ model.fit(
     nb_epoch=epochs,
     validation_split=0.05)
 
+X_test=X_test.reshape(2987,126)
 predicted = predict_point_by_point(model, X_test)
 plt.figure(1)
 plt.plot(predicted)
