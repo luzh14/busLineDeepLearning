@@ -15,7 +15,6 @@ import os
 
 # 使用preprocess_data处理数据:
 X_train, y_train, X_test, y_test = preprocess_data('main.csv',128)
-NULL, y_train, NULL, y_test = preprocess_data('microwave.csv',128)
 
 
 def build_model(layers):
@@ -25,12 +24,12 @@ def build_model(layers):
         input_dim=layers[0],
         output_dim=layers[1],
         return_sequences=True))
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.2))
 
     model.add(LSTM(
         layers[2],
         return_sequences=False))
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.2))
 
     model.add(Dense(
         output_dim=layers[3]))
@@ -54,23 +53,19 @@ print('> Loading data... ')
 
 print('> Data Loaded. Compiling...')
 
-model = build_model([1, 128, 100, 1])
+model = build_model([1, 356, 100, 1])
 
 model.fit(
     X_train,
     y_train,
-    batch_size=250,
+    batch_size=500,
     nb_epoch=epochs,
     validation_split=0.05)
 
 predicted = predict_point_by_point(model, X_test)
-plt.figure(1)
 plt.plot(predicted)
+plt.plot(X_test)
 plt.show()
-plt.figure(2)
-plt.plot(y_test)
-
-
 
 
 

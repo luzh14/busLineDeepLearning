@@ -20,18 +20,9 @@ main=Series(channel_1[:,1],index=[datetime.datetime.strptime(x,'%Y%m%d%H%M%S') f
 main=main.resample('S',fill_method='ffill')[0:]#插值
 
 microwave=Series(channel_11[:,1],index=[datetime.datetime.strptime(x,'%Y%m%d%H%M%S') for x in microwaveTimeStamp])
-microwave=microwave.resample('S').ffill()#插值
+microwave=microwave.resample('S',fill_method='ffill')[0:]#插值
 
-#main=(((main-main.min())/(main.max()-main.min()))-0.5)*2
-main=(main/300)-1
 f = open("/Users/luzh14/busLineDeepLearning/main.csv",'wb')
 for x in range(0,30000):
-    f.write(str(main[x])+'\n')
+    f.write(str(channel_1[x,1]/1000)+'\n')
 f.close()
-
-microwave=(microwave-microwave.mean())/microwave.mean()
-f = open("/Users/luzh14/busLineDeepLearning/microwave.csv",'wb')
-for x in range(0,30000):
-    f.write(str(microwave[x])+'\n')
-f.close()
-
