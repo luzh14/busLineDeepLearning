@@ -18,7 +18,7 @@ from keras.utils.np_utils import to_categorical
 
 # 使用preprocess_data处理数据:
 X_train, y_train, X_test, y_test = preprocess_data('main.csv',256)
-#x, y_train, x, y_test = preprocess_data('microwave.csv',256)
+x, y_train, x, y_test = preprocess_data('microBool.csv',256)
 
 
 def build_model(layers):
@@ -67,14 +67,15 @@ model = build_model([1, 32, 32, 1])
 model.fit(
     X_train,
     y_train,
-    batch_size=500,
+    batch_size=10000,
     nb_epoch=epochs,
+    train_iter=10,
     validation_split=0.02)
 
 predicted = predict_point_by_point(model, X_test)
 plt.plot(predicted)
-
 plt.show()
+
 plt.plot(X_test)
 
 

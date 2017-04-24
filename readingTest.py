@@ -1,42 +1,17 @@
 import numpy as np
-from numpy import genfromtxt
-import scipy.io as sio
-import pandas as pd
-from pandas import Series
-
-import datetime
-import csv
-
-channel_1=pd.read_csv('/Users/luzh14/nilmtk/data/REDD/low_freq/house_1/channel_1.dat', delimiter=' ')
-channel_2=pd.read_csv('/Users/luzh14/nilmtk/data/REDD/low_freq/house_1/channel_2.dat', delimiter=' ')
-channel_11=pd.read_csv('/Users/luzh14/nilmtk/data/REDD/low_freq/house_1/channel_11.dat', delimiter=' ')
-
-
-channel_1=np.array(channel_1)
-channel_2=np.array(channel_2)
-channel_11=np.array(channel_11)
-
-date=channel_1[:,0]
-
-
-a=[]
-for x in date:
-    a.append(datetime.datetime.fromtimestamp(x).strftime('%Y%m%d%H%M%S'))
-
-
-a=str(a)
-f = open("a.txt",'wb')
-f.write(a)
-f.close()
-
-ts=Series(channel_1[:,1],index=[datetime.datetime.strptime(x,'%Y%m%d%H%M%S') for x in a])
-
-print(ts)
-
-busLineLoad=np.transpose(channel_1[:,1]+channel_1[:,1])
-microwave=np.transpose(channel_11[:,1])
-
-
-
-save_fn = 'loadData.mat'
-sio.savemat(save_fn, {'X':a,'Y':microwave})
+f = open('main.csv', 'rb').read()
+seq_len=258
+data = f.decode().split('\n')
+#print(data)
+sequence_length = seq_len - 1
+result = []
+for index in range(len(data) - sequence_length):
+    result.append(data[index: index + sequence_length])
+result = np.array(result)
+row = round(0.9 * result.shape[0])
+train = result[:int(row)]
+np.random.shuffle(train)
+x_train = train[:-1]
+y_train = train[-1]
+x_test = result[int(row):, :-1]
+y_test = result[int(row):, -1]

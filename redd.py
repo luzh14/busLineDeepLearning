@@ -22,12 +22,13 @@ main=main.resample('S',fill_method='ffill')[0:]#插值
 microwave=Series(channel_11[:,1],index=[datetime.datetime.strptime(x,'%Y%m%d%H%M%S') for x in microwaveTimeStamp])
 microwave=microwave.resample('S',fill_method='ffill')[0:]#插值
 
+main=round(main)
 main=main/main.max()
 microwave=microwave/microwave.max()
 
 f = open("/Users/luzh14/busLineDeepLearning/main.csv",'wb')
 for x in range(0,300000):
-    f.write(str(main[x])+'\n')
+    f.write(str(int(main[x]))+'\n')
 f.close()
 
 f = open("/Users/luzh14/busLineDeepLearning/microwave.csv",'wb')
