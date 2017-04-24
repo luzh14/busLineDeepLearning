@@ -18,38 +18,34 @@ from keras.utils.np_utils import to_categorical
 
 # 使用preprocess_data处理数据:
 X_train, y_train, X_test, y_test = preprocess_data('main.csv',256)
-x, y_train, x, y_test = preprocess_data('microwave.csv',256)
+#x, y_train, x, y_test = preprocess_data('microwave.csv',256)
 
 
 def build_model(layers):
     model = Sequential()
 
-    model.add(Conv1D(filter_length=64, nb_filter=10,
+    model.add(Conv1D(filter_length=4, nb_filter=layers[2],
                      input_shape=(254, 1),
                      activation='relu'))
-    model.add(Conv1D(filter_length=32, nb_filter=10,
-                     activation='relu'))
-
-    model.add(Conv1D(filter_length=16, nb_filter=10,
-                     activation='relu'))
-
-    model.add(LSTM(
-        #input_dim=layers[0],
-        output_dim=layers[1],
-        return_sequences=True))
-    model.add(Dropout(0.2))
-
     model.add(LSTM(
         layers[2],
         return_sequences=False))
     model.add(Dropout(0.2))
 
     model.add(Dense(
+        output_dim=32))
+    model.add(Activation("relu"))
+
+    model.add(Dense(
+        output_dim=32))
+    model.add(Activation("relu"))
+
+    model.add(Dense(
         output_dim=layers[3]))
     model.add(Activation("linear"))
 
     start = time.time()
-    model.compile(loss="mean_squared_logarithmic_error", optimizer="rmsprop")
+    model.compile(loss="mean_squared_error", optimizer="rmsprop")
     print("> Compilation Time : ", time.time() - start)
     return model
 

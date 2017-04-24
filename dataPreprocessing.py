@@ -6,14 +6,14 @@ import os
 def preprocess_data(path,seq_len):
     f = open(path, 'rb').read()
     data = f.decode().split('\n')
-    print(data)
+    #print(data)
     sequence_length = seq_len - 1
     result = []
     for index in range(len(data) - sequence_length):
         result.append(data[index: index + sequence_length])
 
     result = np.array(result)
-    print(result)
+    #print(result)
     row = round(0.9 * result.shape[0])
     train = result[:int(row), :]
     np.random.shuffle(train)
