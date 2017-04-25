@@ -77,7 +77,6 @@ model.fit(
 
 predicted = predict_point_by_point(model, X_test)
 plt.plot(predicted)
-
 plt.show()
 plt.plot(X_test)
 
